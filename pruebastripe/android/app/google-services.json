@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "711263919058",
+    "firebase_url": "https://pruebastripe-57050.firebaseio.com",
+    "project_id": "pruebastripe-57050",
+    "storage_bucket": "pruebastripe-57050.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:711263919058:android:d2ea022155c5b6d6da460b",
+        "android_client_info": {
+          "package_name": "com.example.pruebastripe"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "711263919058-iu9kldd6fodp9p8bku1lcdq6vd1mdei1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAf1FgLHssTLr9yM-cq7L2izkMuvd1-dwI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "711263919058-iu9kldd6fodp9p8bku1lcdq6vd1mdei1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
