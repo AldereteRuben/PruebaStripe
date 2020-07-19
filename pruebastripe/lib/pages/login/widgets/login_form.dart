@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:pruebastripe/libs/auth.dart';
 import 'package:pruebastripe/pages/login/widgets/input_text_login.dart';
 import 'package:pruebastripe/pages/login/widgets/rounded_button.dart';
 import 'package:pruebastripe/utils/responsive.dart';
@@ -57,6 +58,7 @@ class LoginForm extends StatelessWidget {
                   size: 55,
                   iconPath: 'assets/pages/login/icons/facebook.svg',
                   backgroundColor: Color(0xff1448AFF),
+                  onPressed: () {},
                 ),
                 SizedBox(
                   width: 20,
@@ -64,6 +66,10 @@ class LoginForm extends StatelessWidget {
                 CircleButton(
                   backgroundColor: Color(0xffFF1744),
                   iconPath: 'assets/pages/login/icons/google.svg',
+                  onPressed: () async {
+                    await Auth.instance.google();
+                    print('listo');
+                  },
                   size: 55,
                 ),
               ],
