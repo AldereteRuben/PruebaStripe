@@ -1,3 +1,4 @@
+import 'package:after_layout/after_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pruebastripe/pages/login/widgets/login_form.dart';
@@ -11,7 +12,7 @@ class LoginPage extends StatefulWidget {
   _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginPage> with AfterLayoutMixin {
   @override
   void initState() {
     super.initState();
@@ -19,8 +20,17 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   @override
+  void afterFirstLayout(BuildContext context) {
+    final bool isTablet = MediaQuery.of(context).size.shortestSide >= 600;
+    if (!isTablet) {
+      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final Responsive responsive = Responsive.of(context);
+
     return Scaffold(
       body: GestureDetector(
         onTap: () {
@@ -30,15 +40,44 @@ class _LoginPageState extends State<LoginPage> {
           width: double.infinity,
           height: double.infinity,
           color: Colors.white,
-          child: SingleChildScrollView(
-            child: Container(
-              height: responsive.height,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[Welcome(), LoginForm()],
-              ),
-            ),
-          ),
+          child: OrientationBuilder(builder: (_, Orientation orientation) {
+            if (orientation == Orientation.portrait) {
+              return SingleChildScrollView(
+                child: Container(
+                  height: responsive.height,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[Welcome(), LoginForm()],
+                  ),
+                ),
+              );
+            } else {
+              return Row(
+                children: <Widget>[
+                  Expanded(
+                      child: SingleChildScrollView(
+                    physics: NeverScrollableScrollPhysics(),
+                    child: Container(
+                      padding: EdgeInsets.only(left: 20),
+                      height: responsive.height,
+                      child: Center(
+                        child: Welcome(),
+                      ),
+                    ),
+                  )),
+                  Expanded(
+                      child: SingleChildScrollView(
+                    child: Container(
+                      height: responsive.height,
+                      child: Center(
+                        child: LoginPage(),
+                      ),
+                    ),
+                  ))
+                ],
+              );
+            }
+          }),
         ),
       ),
     );
