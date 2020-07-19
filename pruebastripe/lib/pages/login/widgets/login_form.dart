@@ -58,7 +58,10 @@ class LoginForm extends StatelessWidget {
                   size: 55,
                   iconPath: 'assets/pages/login/icons/facebook.svg',
                   backgroundColor: Color(0xff1448AFF),
-                  onPressed: () {},
+                  onPressed: () async {
+                    await Auth.instance.facebook();
+                    print('listooo');
+                  },
                 ),
                 SizedBox(
                   width: 20,
