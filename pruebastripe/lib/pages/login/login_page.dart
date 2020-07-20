@@ -6,6 +6,8 @@ import 'package:pruebastripe/pages/login/widgets/welcome.dart';
 import 'package:pruebastripe/utils/responsive.dart';
 
 class LoginPage extends StatefulWidget {
+  static final routeName = 'login';
+
   LoginPage({Key key}) : super(key: key);
 
   @override

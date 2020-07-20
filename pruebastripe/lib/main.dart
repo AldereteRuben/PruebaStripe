@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:pruebastripe/pages/home/home_page.dart';
 import 'package:pruebastripe/pages/login/login_page.dart';
+import 'package:pruebastripe/pages/splash/splash_page.dart';
 
 void main() {
   runApp(MyApp());
@@ -16,7 +18,12 @@ class MyApp extends StatelessWidget {
         fontFamily: 'sans',
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: LoginPage(),
+      home: SplashPage(),
+      routes: {
+        HomePage.routeName: (_) => HomePage(),
+        SplashPage.routeName: (_) => SplashPage(),
+        LoginPage.routeName: (_) => LoginPage(),
+      },
     );
   }
 }
