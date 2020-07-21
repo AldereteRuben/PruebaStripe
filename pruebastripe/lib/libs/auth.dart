@@ -4,6 +4,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter/widgets.dart';
 import 'package:pruebastripe/pages/login/login_page.dart';
+import 'package:pruebastripe/utils/dialogs.dart';
 
 class Auth {
   Auth._internal();
@@ -17,8 +18,10 @@ class Auth {
     return await (_firebaseAuth.currentUser());
   }
 
-  Future<FirebaseUser> facebook() async {
+  Future<FirebaseUser> facebook(BuildContext context) async {
+    ProgressDialog progressDialog = ProgressDialog(context);
     try {
+      progressDialog.show();
       final LoginResult result = await FacebookAuth.instance.login();
       if (result.status == 200) {
         print('Intento de login con Facebook correctamente');
@@ -31,21 +34,27 @@ class Auth {
 
         final FirebaseUser user = authResult.user;
         print("usuario Facebook: ${user.displayName}");
+        progressDialog.dismiss();
         return user;
       } else if (result.status == 403) {
         print('canceló el intento de login con Facebook');
       } else {
         print('Fallo el intento de login con Facebook');
       }
+      progressDialog.dismiss();
       return null;
     } catch (e) {
       print(e);
+      progressDialog.dismiss();
       return null;
     }
   }
 
-  Future<FirebaseUser> google() async {
+  Future<FirebaseUser> google(BuildContext context) async {
+    ProgressDialog progressDialog = ProgressDialog(context);
     try {
+      progressDialog.show();
+
       final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
       final GoogleSignInAuthentication autentication =
           await googleUser.authentication;
@@ -59,9 +68,11 @@ class Auth {
 
       final FirebaseUser user = result.user;
       print("usuario: ${user.displayName}");
+      progressDialog.dismiss();
       return user;
     } catch (e) {
       print(e);
+      progressDialog.dismiss();
       return null;
     }
   }

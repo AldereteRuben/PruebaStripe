@@ -88,6 +88,14 @@ class _HomePageState extends State<HomePage> {
                         style: TextStyle(
                             fontSize: 15, fontWeight: FontWeight.w300),
                       ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      CupertinoButton(
+                          child: Text('Cerrar Sesión'),
+                          onPressed: () {
+                            Auth.instance.logOut(context);
+                          })
                     ],
                   );
                 } else if (snapshot.hasError) {
