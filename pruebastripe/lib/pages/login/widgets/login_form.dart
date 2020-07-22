@@ -5,19 +5,30 @@ import 'package:pruebastripe/libs/auth.dart';
 import 'package:pruebastripe/pages/home/home_page.dart';
 import 'package:pruebastripe/pages/login/widgets/input_text_login.dart';
 import 'package:pruebastripe/pages/login/widgets/rounded_button.dart';
+import 'package:pruebastripe/utils/extras.dart';
 import 'package:pruebastripe/utils/responsive.dart';
 import 'package:pruebastripe/widgets/circle_button.dart';
 
-class LoginForm extends StatelessWidget {
+class LoginForm extends StatefulWidget {
+  final Alignment alignment;
   final VoidCallback onGoToResgister, onGoToForgetPassword;
 
   const LoginForm(
       {Key key,
       @required this.onGoToResgister,
-      @required this.onGoToForgetPassword})
+      @required this.onGoToForgetPassword,
+      this.alignment = Alignment.bottomCenter})
       : super(key: key);
 
-  void _goTo(BuildContext context, FirebaseUser user) {
+  @override
+  _LoginFormState createState() => _LoginFormState();
+}
+
+class _LoginFormState extends State<LoginForm> {
+  final GlobalKey<InputTextLoginState> _emailKey = GlobalKey();
+  final GlobalKey<InputTextLoginState> _passwordKey = GlobalKey();
+
+  void _goTo(FirebaseUser user) {
     if (user != null) {
       Navigator.pushReplacementNamed(context, HomePage.routeName);
     } else {
@@ -25,11 +36,26 @@ class LoginForm extends StatelessWidget {
     }
   }
 
+  Future<void> _submit() async {
+    final String email = _emailKey.currentState.value;
+    final String password = _passwordKey.currentState.value;
+
+    final bool emailOk = _emailKey.currentState.isOk;
+    final bool passwordOk = _passwordKey.currentState.isOk;
+
+    if (emailOk && passwordOk) {
+      final FirebaseUser user = await Auth.instance
+          .loginByPassword(context, email: email, password: password);
+
+      _goTo(user);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final Responsive responsive = Responsive.of(context);
     return Align(
-      alignment: Alignment.bottomCenter,
+      alignment: widget.alignment,
       child: SafeArea(
         top: false,
         child: Container(
@@ -39,14 +65,24 @@ class LoginForm extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               InputTextLogin(
-                  iconPath: "assets/pages/login/icons/correo-electronico.svg",
-                  placeholder: "Correo Electronico"),
+                key: _emailKey,
+                iconPath: "assets/pages/login/icons/correo-electronico.svg",
+                placeholder: "Correo Electronico",
+                keyboardType: TextInputType.emailAddress,
+                validator: (text) => Extras.isValidEmail(text),
+              ),
               SizedBox(
                 height: responsive.ip(2),
               ),
               InputTextLogin(
-                  iconPath: "assets/pages/login/icons/llave.svg",
-                  placeholder: "Contraseña"),
+                key: _passwordKey,
+                iconPath: "assets/pages/login/icons/llave.svg",
+                placeholder: "Contraseña",
+                obscureText: true,
+                validator: (text) {
+                  return text.trim().length >= 6;
+                },
+              ),
               Container(
                 width: double.infinity,
                 alignment: Alignment.centerRight,
@@ -56,13 +92,16 @@ class LoginForm extends StatelessWidget {
                     '¿Recuperar contraseña?',
                     style: TextStyle(fontFamily: 'sans'),
                   ),
-                  onPressed: onGoToForgetPassword,
+                  onPressed: widget.onGoToForgetPassword,
                 ),
               ),
               SizedBox(
                 height: responsive.ip(2),
               ),
-              RoudedButton(onPressed: () {}, label: "Entrar"),
+              RoudedButton(
+                label: "Entrar",
+                onPressed: this._submit,
+              ),
               SizedBox(
                 height: responsive.ip(3.3),
               ),
@@ -79,7 +118,7 @@ class LoginForm extends StatelessWidget {
                     backgroundColor: Color(0xff1448AFF),
                     onPressed: () async {
                       final user = await Auth.instance.facebook(context);
-                      _goTo(context, user);
+                      _goTo(user);
                     },
                   ),
                   SizedBox(
@@ -90,7 +129,7 @@ class LoginForm extends StatelessWidget {
                     iconPath: 'assets/pages/login/icons/google.svg',
                     onPressed: () async {
                       final user = await Auth.instance.google(context);
-                      _goTo(context, user);
+                      _goTo(user);
                     },
                     size: 55,
                   ),
@@ -109,7 +148,7 @@ class LoginForm extends StatelessWidget {
                       style: TextStyle(
                           fontFamily: 'sans', fontWeight: FontWeight.w600),
                     ),
-                    onPressed: onGoToResgister,
+                    onPressed: widget.onGoToResgister,
                   )
                 ],
               ),

@@ -54,6 +54,35 @@ class _LoginPageState extends State<LoginPage> with AfterLayoutMixin {
     );
   }
 
+  Widget _getForms(bool isLandscape) {
+    return PageView(
+      controller: _pageController,
+      physics: NeverScrollableScrollPhysics(),
+      children: <Widget>[
+        LoginForm(
+          alignment: isLandscape ? Alignment.center : Alignment.bottomCenter,
+          onGoToResgister: () {
+            _switchForm(LoginFormType.resgister);
+          },
+          onGoToForgetPassword: () {
+            _switchForm(LoginFormType.forgotPassword);
+          },
+        ),
+        RegisterForm(
+          alignment: isLandscape ? Alignment.center : Alignment.bottomCenter,
+          onGoToLogin: () {
+            _switchForm(LoginFormType.login);
+          },
+        ),
+        ForgotPasswordForm(
+          onGoToLogin: () {
+            _switchForm(LoginFormType.login);
+          },
+        )
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final Responsive responsive = Responsive.of(context);
@@ -77,30 +106,8 @@ class _LoginPageState extends State<LoginPage> with AfterLayoutMixin {
                     children: <Widget>[
                       Welcome(),
                       Expanded(
-                          child: PageView(
-                        controller: _pageController,
-                        physics: NeverScrollableScrollPhysics(),
-                        children: <Widget>[
-                          LoginForm(
-                            onGoToResgister: () {
-                              _switchForm(LoginFormType.resgister);
-                            },
-                            onGoToForgetPassword: () {
-                              _switchForm(LoginFormType.forgotPassword);
-                            },
-                          ),
-                          RegisterForm(
-                            onGoToLogin: () {
-                              _switchForm(LoginFormType.login);
-                            },
-                          ),
-                          ForgotPasswordForm(
-                            onGoToLogin: () {
-                              _switchForm(LoginFormType.login);
-                            },
-                          )
-                        ],
-                      ))
+                        child: _getForms(false),
+                      )
                     ],
                   ),
                 ),
@@ -123,16 +130,7 @@ class _LoginPageState extends State<LoginPage> with AfterLayoutMixin {
                       child: SingleChildScrollView(
                     child: Container(
                       height: responsive.height,
-                      child: Center(
-                        child: LoginForm(
-                          onGoToResgister: () {
-                            _switchForm(LoginFormType.resgister);
-                          },
-                          onGoToForgetPassword: () {
-                            _switchForm(LoginFormType.forgotPassword);
-                          },
-                        ),
-                      ),
+                      child: _getForms(true),
                     ),
                   ))
                 ],

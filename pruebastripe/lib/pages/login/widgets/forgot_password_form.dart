@@ -7,6 +7,7 @@ import 'package:pruebastripe/pages/login/widgets/input_text_login.dart';
 import 'package:pruebastripe/pages/login/widgets/rounded_button.dart';
 import 'package:pruebastripe/utils/app_colors.dart';
 import 'package:pruebastripe/utils/responsive.dart';
+import 'package:pruebastripe/utils/extras.dart';
 
 class ForgotPasswordForm extends StatefulWidget {
   final VoidCallback onGoToLogin;
@@ -19,13 +20,27 @@ class ForgotPasswordForm extends StatefulWidget {
 }
 
 class _ForgotPasswordFormState extends State<ForgotPasswordForm> {
-  bool _agree = false;
+  bool _sent = false;
+  final GlobalKey<InputTextLoginState> _emailKey = GlobalKey();
 
   void _goTo(BuildContext context, FirebaseUser user) {
     if (user != null) {
       Navigator.pushReplacementNamed(context, HomePage.routeName);
     } else {
       print("error al iniciar sesión");
+    }
+  }
+
+  Future<void> _submit() async {
+    final String email = _emailKey.currentState.value;
+    final bool emailOk = _emailKey.currentState.isOk;
+
+    if (emailOk) {
+      final bool isOk =
+          await Auth.instance.sendResetEmailLink((context), email: email);
+      setState(() {
+        _sent = isOk;
+      });
     }
   }
 
@@ -58,9 +73,16 @@ class _ForgotPasswordFormState extends State<ForgotPasswordForm> {
               SizedBox(
                 height: responsive.ip(2),
               ),
-              InputTextLogin(
-                  iconPath: "assets/pages/login/icons/correo-electronico.svg",
-                  placeholder: "Correo Electronico"),
+              _sent
+                  ? Text("Correo de recuperación enviado")
+                  : InputTextLogin(
+                      key: _emailKey,
+                      iconPath:
+                          "assets/pages/login/icons/correo-electronico.svg",
+                      placeholder: "Correo Electronico",
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (text) => Extras.isValidEmail(text),
+                    ),
               SizedBox(
                 height: responsive.ip(2),
               ),
@@ -69,13 +91,15 @@ class _ForgotPasswordFormState extends State<ForgotPasswordForm> {
                 children: <Widget>[
                   FlatButton(
                     onPressed: widget.onGoToLogin,
-                    child: Text("Regresar a login"),
+                    child: Text("<- Regresar"),
                   ),
-                  SizedBox(width: 10),
-                  RoudedButton(
-                    label: "Enviar",
-                    onPressed: () {},
-                  )
+                  if (!_sent) ...[
+                    SizedBox(width: 10),
+                    RoudedButton(
+                      label: "Enviar",
+                      onPressed: this._submit,
+                    )
+                  ]
                 ],
               ),
               SizedBox(

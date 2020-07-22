@@ -6,12 +6,19 @@ import 'package:pruebastripe/pages/home/home_page.dart';
 import 'package:pruebastripe/pages/login/widgets/input_text_login.dart';
 import 'package:pruebastripe/pages/login/widgets/rounded_button.dart';
 import 'package:pruebastripe/utils/app_colors.dart';
+import 'package:pruebastripe/utils/dialogs.dart';
+import 'package:pruebastripe/utils/extras.dart';
 import 'package:pruebastripe/utils/responsive.dart';
 
 class RegisterForm extends StatefulWidget {
   final VoidCallback onGoToLogin;
+  final Alignment alignment;
 
-  const RegisterForm({Key key, @required this.onGoToLogin}) : super(key: key);
+  const RegisterForm(
+      {Key key,
+      @required this.onGoToLogin,
+      this.alignment = Alignment.bottomCenter})
+      : super(key: key);
 
   @override
   _RegisterFormState createState() => _RegisterFormState();
@@ -20,19 +27,55 @@ class RegisterForm extends StatefulWidget {
 class _RegisterFormState extends State<RegisterForm> {
   bool _agree = false;
 
-  void _goTo(BuildContext context, FirebaseUser user) {
+  final GlobalKey<InputTextLoginState> _usernameKey = GlobalKey();
+  final GlobalKey<InputTextLoginState> _emailKey = GlobalKey();
+  final GlobalKey<InputTextLoginState> _passwordKey = GlobalKey();
+  final GlobalKey<InputTextLoginState> _vpasswordKey = GlobalKey();
+
+  void _goTo(FirebaseUser user) {
     if (user != null) {
       Navigator.pushReplacementNamed(context, HomePage.routeName);
     } else {
-      print("error al iniciar sesión");
+      print("error en el registro");
     }
+  }
+
+  _submit() async {
+    final String username = _usernameKey.currentState.value;
+    final String email = _emailKey.currentState.value;
+    final String password = _passwordKey.currentState.value;
+    final String vpassword = _vpasswordKey.currentState.value;
+
+    final bool usernameOk = _usernameKey.currentState.isOk;
+    final bool emailOk = _emailKey.currentState.isOk;
+    final bool passwordOk = _passwordKey.currentState.isOk;
+    final bool vpasswordOk = _vpasswordKey.currentState.isOk;
+
+    if (usernameOk && emailOk && passwordOk && vpasswordOk) {
+      if (_agree) {
+        final FirebaseUser user = await Auth.instance.signUp(
+          context,
+          username: username,
+          email: email,
+          password: password,
+        );
+        _goTo(user);
+      } else {
+        Dialogs.alert(context,
+            description: "Necesitas aceptar términos y condiciones");
+      }
+    } else {
+      Dialogs.alert(context, description: "Campos inválidos");
+    }
+
+    print(username);
   }
 
   @override
   Widget build(BuildContext context) {
     final Responsive responsive = Responsive.of(context);
     return Align(
-      alignment: Alignment.bottomCenter,
+      alignment: widget.alignment,
       child: SafeArea(
         top: false,
         child: Container(
@@ -58,26 +101,50 @@ class _RegisterFormState extends State<RegisterForm> {
                 height: responsive.ip(2),
               ),
               InputTextLogin(
-                  iconPath: "assets/pages/login/icons/user.svg",
-                  placeholder: "Nombre de usuario"),
+                key: _usernameKey,
+                iconPath: "assets/pages/login/icons/user.svg",
+                placeholder: "Nombre de usuario",
+                validator: (text) {
+                  return text.trim().length > 0;
+                },
+              ),
               SizedBox(
                 height: responsive.ip(2),
               ),
               InputTextLogin(
-                  iconPath: "assets/pages/login/icons/correo-electronico.svg",
-                  placeholder: "Correo Electronico"),
+                key: _emailKey,
+                iconPath: "assets/pages/login/icons/correo-electronico.svg",
+                placeholder: "Correo Electronico",
+                keyboardType: TextInputType.emailAddress,
+                validator: (text) => Extras.isValidEmail(text),
+              ),
               SizedBox(
                 height: responsive.ip(2),
               ),
               InputTextLogin(
-                  iconPath: "assets/pages/login/icons/llave.svg",
-                  placeholder: "Contraseña"),
+                key: _passwordKey,
+                iconPath: "assets/pages/login/icons/llave.svg",
+                placeholder: "Contraseña",
+                obscureText: true,
+                validator: (text) {
+                  _vpasswordKey.currentState?.checkValidation();
+                  return text.trim().length >= 6;
+                },
+              ),
               SizedBox(
                 height: responsive.ip(2),
               ),
               InputTextLogin(
-                  iconPath: "assets/pages/login/icons/llave.svg",
-                  placeholder: "Confirmar contraseña"),
+                key: _vpasswordKey,
+                obscureText: true,
+                iconPath: "assets/pages/login/icons/llave.svg",
+                placeholder: "Confirmar contraseña",
+                validator: (text) {
+                  return text.trim().length >= 6 &&
+                      _vpasswordKey.currentState.value ==
+                          _passwordKey.currentState.value;
+                },
+              ),
               SizedBox(
                 height: responsive.ip(2),
               ),
@@ -127,12 +194,12 @@ class _RegisterFormState extends State<RegisterForm> {
                 children: <Widget>[
                   FlatButton(
                     onPressed: widget.onGoToLogin,
-                    child: Text("Regresar a login"),
+                    child: Text("<- Regresar"),
                   ),
                   SizedBox(width: 10),
                   RoudedButton(
-                    label: "Registrar",
-                    onPressed: () {},
+                    label: "Registrarse",
+                    onPressed: _submit(),
                   )
                 ],
               ),
