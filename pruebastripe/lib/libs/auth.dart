@@ -137,7 +137,7 @@ class Auth {
         message = "El email ya lo usa otra cuenta";
       } else if (e.code == "ERROR_WEAK_PASSWORD") {
         message = "La contraseña debe tener al menos 6 caracteres";
-      } else {}
+      }
       print(e);
       progressDialog.dismiss();
       Dialogs.alert(context, title: "ERROR", description: message);
