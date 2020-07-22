@@ -59,6 +59,7 @@ flutter:
      - assets/pages/login/icons/llave.svg
      - assets/pages/login/icons/facebook.svg
      - assets/pages/login/icons/google.svg
+     - assets/pages/login/icons/user.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
