@@ -36,7 +36,7 @@ class _LoginFormState extends State<LoginForm> {
     }
   }
 
-  Future<void> _submit() async {
+  _submit() async {
     final String email = _emailKey.currentState.value;
     final String password = _passwordKey.currentState.value;
 
